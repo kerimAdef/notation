@@ -7,10 +7,10 @@ import java.util.List;
 
 public class DatabaseNotation {
     // URL de la base de données SQLite
-    private static final String URL = "jdbc:sqlite:etudiant.db";
+    private static final String URL = "jdbc:sqlite:etudiants.db";
     // Requête SQL pour créer la table des étudiants
     private static final String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS etudiants (" +
-            "id TEXT PRIMARY KEY, " +
+            "id INTEGER PRIMARY KEY, " +
             "nom TEXT NOT NULL, " +
             "note REAL NOT NULL)";
     // Requête SQL pour insérer un étudiant dans la table
@@ -43,7 +43,7 @@ public class DatabaseNotation {
              PreparedStatement pstmt = conn.prepareStatement(INSERT_STUDENT_SQL)) {
             for (Etudiant etudiant : etudiants) {
                 // Définir les valeurs des paramètres de la requête
-                pstmt.setString(1, etudiant.getId());
+                pstmt.setInt(1, etudiant.getId());
                 pstmt.setString(2, etudiant.getNom());
                 pstmt.setDouble(3, etudiant.getNote());
                 pstmt.addBatch();  // Ajouter la requête à un lot

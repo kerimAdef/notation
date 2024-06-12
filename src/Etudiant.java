@@ -1,21 +1,21 @@
 public class Etudiant {
-    private String id;
+    private int id;
     private String nom;
     private double note;
 
     // Constructeur pour initialiser les attributs d'un étudiant
-    public Etudiant(String id, String nom, double note) {
+    public Etudiant(int id, String nom, double note) {
         this.id = id;
         this.nom = nom;
         this.note = note;
     }
 
     // Getters et setters pour accéder et modifier les attributs d'un étudiant
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -35,5 +35,8 @@ public class Etudiant {
             throw new IllegalArgumentException("la note doit être comprise entre  0 et 20");
         }
         this.note = note;
+    }
+    public String toString() {
+        return "Etudiant{id=" + id + ", nom='" + nom + "', note=" + note + '}';
     }
 }
