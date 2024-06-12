@@ -17,5 +17,7 @@ public class Main {
         DatabaseNotation.AjoutEtudiant(etudiants);
 
         System.out.println("Les étudiants ont été importés avec succès dans la base de données.");
+        System.out.println("Liste des étudiants dans la base de données :");
+        DatabaseNotation.afficherEtudiants();  // Afficher les étudiants dans la base de données
     }
 }
