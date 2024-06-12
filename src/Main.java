@@ -7,6 +7,7 @@ public class Main {
             return;  // Arrêter le programme si le nombre d'arguments est incorrect
         }
 
+
         String csvFilePath = args[0];  // Récupérer le chemin du fichier CSV depuis les arguments
         List<Etudiant> etudiants = CSVReader.readCSV(csvFilePath);  // Lire les étudiants depuis le fichier CSV
 
