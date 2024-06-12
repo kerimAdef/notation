@@ -30,8 +30,10 @@ public class Etudiant {
     public double getNote() {
         return note;
     }
-
-    public void setNote(double note) {
+    public void setNote(double note){
+        if(note < 0 || note > 20 ){
+            throw new IllegalArgumentException("la note doit être comprise entre  0 et 20");
+        }
         this.note = note;
     }
 }
