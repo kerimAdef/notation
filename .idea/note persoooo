@@ -1,0 +1,249 @@
+Pour réaliser ce projet en Java en mode console, nous allons suivre les étapes suivantes :
+
+1. **Définir la structure du projet**
+2. **Importer une liste d'étudiants depuis un fichier CSV**
+3. **Stocker les étudiants et leurs notes dans une base de données SQLite**
+4. **Utiliser le connecteur JDBC pour interagir avec SQLite**
+5. **Générer un JAR exécutable avec les instructions pour l'exécution**
+
+### 1. Définir la structure du projet
+
+Nous allons structurer notre projet de la manière suivante :
+
+```
+StudentGradesApp/
+|-- src/
+|   |-- main/
+|       |-- java/
+|           |-- com/
+|               |-- example/
+|                   |-- Main.java
+|                   |-- Student.java
+|                   |-- DatabaseManager.java
+|                   |-- CSVImporter.java
+|-- lib/
+|-- resources/
+|-- build.gradle
+```
+
+### 2. Code Source
+
+#### `Student.java`
+```java
+package com.example;
+
+public class Student {
+    private int id;
+    private String name;
+    private double grade;
+
+    public Student(int id, String name, double grade) {
+        this.id = id;
+        this.name = name;
+        this.grade = grade;
+    }
+
+    // Getters and setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getGrade() {
+        return grade;
+    }
+
+    public void setGrade(double grade) {
+        this.grade = grade;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{id=" + id + ", name='" + name + "', grade=" + grade + '}';
+    }
+}
+```
+
+#### `DatabaseManager.java`
+```java
+package com.example;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class DatabaseManager {
+    private static final String DB_URL = "jdbc:sqlite:students.db";
+
+    public void createDatabase() {
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            if (conn != null) {
+                String createTableSQL = "CREATE TABLE IF NOT EXISTS students ("
+                        + "id INTEGER PRIMARY KEY,"
+                        + "name TEXT NOT NULL,"
+                        + "grade REAL"
+                        + ");";
+                PreparedStatement pstmt = conn.prepareStatement(createTableSQL);
+                pstmt.execute();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insertStudent(Student student) {
+        String insertSQL = "INSERT INTO students(id, name, grade) VALUES(?,?,?)";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+            pstmt.setInt(1, student.getId());
+            pstmt.setString(2, student.getName());
+            pstmt.setDouble(3, student.getGrade());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+#### `CSVImporter.java`
+```java
+package com.example;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CSVImporter {
+    public List<Student> importCSV(String filePath) {
+        List<Student> students = new ArrayList<>();
+        String line;
+        String csvSplitBy = ",";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            while ((line = br.readLine()) != null) {
+                String[] studentData = line.split(csvSplitBy);
+                Student student = new Student(
+                        Integer.parseInt(studentData[0]),
+                        studentData[1],
+                        Double.parseDouble(studentData[2])
+                );
+                students.add(student);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return students;
+    }
+}
+```
+
+#### `Main.java`
+```java
+package com.example;
+
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Usage: java -jar StudentGradesApp.jar <path_to_csv_file>");
+            System.exit(1);
+        }
+
+        String csvFilePath = args[0];
+
+        CSVImporter csvImporter = new CSVImporter();
+        List<Student> students = csvImporter.importCSV(csvFilePath);
+
+        DatabaseManager dbManager = new DatabaseManager();
+        dbManager.createDatabase();
+
+        for (Student student : students) {
+            dbManager.insertStudent(student);
+        }
+
+        System.out.println("Students have been successfully imported into the database.");
+    }
+}
+```
+
+### 3. Dépendances et Build
+
+Nous allons utiliser Gradle pour la gestion des dépendances et la construction du projet. Voici le fichier `build.gradle` :
+
+```groovy
+plugins {
+    id 'java'
+    id 'application'
+}
+
+application {
+    mainClassName = 'com.example.Main'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.example.Main'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+```
+
+### 4. Générer le JAR
+
+Pour générer le JAR, exécutez la commande suivante dans le répertoire racine du projet :
+
+```sh
+./gradlew clean build
+```
+
+Le fichier JAR se trouvera dans `build/libs/`.
+
+### 5. Instructions pour l'exécution
+
+Pour exécuter le JAR généré, utilisez la commande suivante :
+
+```sh
+java -jar build/libs/StudentGradesApp.jar <path_to_csv_file>
+```
+
+Assurez-vous que le fichier CSV est formaté comme suit :
+```
+id,name,grade
+1,John Doe,85.5
+2,Jane Smith,92.0
+3,Bob Johnson,78.0
+```
+
+### 6. Livrer les sources et le JAR
+
+- **Sources** : Inclure tout le contenu du dossier `StudentGradesApp`.
+- **JAR** : Inclure le fichier JAR généré situé dans `build/libs/StudentGradesApp.jar`.
+
+Avec cela, votre projet Java console est prêt à être utilisé et distribué. Si vous avez des questions supplémentaires ou des ajustements, n'hésitez pas à demander ! 😊🔨🤖🔧
