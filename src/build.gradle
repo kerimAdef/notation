@@ -6,19 +6,19 @@ repositories {
     mavenCentral()
 }
 
+
 dependencies {
-    // Dépendance pour le connecteur JDBC SQLite
     implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
 }
 
 application {
-    mainClass = 'com.example.Main'
+    mainClass = 'Main'
 }
 
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.example.Main'
+                'Main-Class': 'Main'
         )
     }
 }
