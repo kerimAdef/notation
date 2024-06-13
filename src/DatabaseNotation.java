@@ -120,7 +120,7 @@ public class DatabaseNotation {
             if (rs.next()) {
                 String nom = rs.getString("nom");
                 double note = rs.getDouble("note");
-                System.out.println("ID: " + id + ", Nom: " + nom + ", Note: " + note);
+                System.out.println("l'éleve  " + nom + ", a eu : " + note+"/20");
             } else {
                 System.out.println("Aucun étudiant trouvé avec l'ID: " + id);
             }
@@ -131,19 +131,26 @@ public class DatabaseNotation {
 
     // Méthode pour mettre à jour la note d'un étudiant
     public static void ajouterNoteEtudiant(int id, double note) {
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(UPDATE_NOTE_SQL)) {
-            pstmt.setDouble(1, note);
-            pstmt.setInt(2, id);
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                System.out.println("Note mise à jour avec succès pour l'étudiant avec l'ID: " + id);
-            } else {
-                System.out.println("Aucun étudiant trouvé avec l'ID: " + id);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+                if (note>=0 && note<=20) {
+                    try (Connection conn = connect();
+                         PreparedStatement pstmt = conn.prepareStatement(UPDATE_NOTE_SQL)) {
+                        pstmt.setDouble(1, note);
+                        pstmt.setInt(2, id);
+                            int affectedRows = pstmt.executeUpdate();
+                            if (affectedRows > 0) {
+                                System.out.println("Note mise à jour avec succès pour l'étudiant avec l'ID: " + id);
+                            } else {
+                                System.out.println("Aucun étudiant trouvé avec l'ID: " + id);
+                            }
+                    } catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else {
+                    System.out.println("veuiller saisir une note compris entre 0 à 20");
+                }
+
+
     }
 
     // Méthode pour afficher la moyenne des notes d'un étudiant
@@ -154,7 +161,7 @@ public class DatabaseNotation {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 double average = rs.getDouble("average");  // Récupérer la moyenne des notes
-                System.out.println("Moyenne des notes de l'étudiant avec l'ID " + id + ": " + average);  // Afficher la moyenne
+                System.out.println("Moyenne des notes de l'étudiant : " + id + ": " + average);  // Afficher la moyenne
             } else {
                 System.out.println("Aucun étudiant trouvé avec l'ID: " + id);
             }

@@ -13,7 +13,6 @@ public class CSVGenerator {
                 "5,YVAN,13.5",
                 "6, ALLAN,13",
                 "7,MODRIC, 18",
-                "1,MOMO,10",
         };
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(csvFile))) {
